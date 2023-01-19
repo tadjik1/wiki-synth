@@ -1,4 +1,5 @@
 const axios = require('axios');
+const yandex = require('../utils/yandex');
 
 module.exports = async function wikipedia(ctx) {
     const response = await axios.get('https://ru.wikipedia.org/w/api.php', {
@@ -13,8 +14,6 @@ module.exports = async function wikipedia(ctx) {
         }
     });
 
-    console.log(response.data.query.pages);
-
     const { pages } = response.data.query;
 
     if (pages['-1']) {
@@ -23,6 +22,14 @@ module.exports = async function wikipedia(ctx) {
     }
 
     const page = Object.keys(pages)[0];
+    let text = pages[page].extract.replaceAll('\n', ' ').slice(0, 300);
+    text = text.slice(0, text.lastIndexOf('.'));
 
-    ctx.reply(pages[page].extract.replaceAll('\n', ' '));
+    const file = await yandex(text);
+    if (!file) {
+        ctx.reply('что-то сломалось');
+        return;
+    }
+
+    ctx.sendVoice({ source: file });
 }
