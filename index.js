@@ -1,11 +1,13 @@
 const crypto = require('node:crypto');
 const { Telegraf } = require('telegraf');
 
+const wikipedia = require('./controllers/wikipedia');
+
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
 bot.start((ctx) => ctx.reply('привет'));
 
-bot.on('message', (ctx) => ctx.reply('привет'));
+bot.on('message', wikipedia);
 
 bot.launch({
     webhook: {
